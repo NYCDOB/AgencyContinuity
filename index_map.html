@@ -84,7 +84,60 @@ div.tooltip {
 	margin: auto;
 	padding-top: 350px;
 }
-
+#tbl_heading{
+	font-size: 14px;
+}
+.ui {
+	top: 10px;
+	left: 50px;
+	padding: 8px;
+	position: absolute;
+	background-color: #fff;
+	border: 2px solid #707070;
+	border-radius: 7px;
+	width: 315px;
+}
+.dot {
+  position: relative;
+  top: 3px;
+  height: 15px;
+  width: 15px;
+  background-color: #FFAA00;
+  border-radius: 50%;
+  display: inline-block;
+}
+.legend_label{
+	padding-left: 10px;
+	font-size: 12px;
+	display: inline-block;
+}
+.cat1{
+  position: relative;
+  top: 3px;
+  height: 15px;
+  width: 15px;
+  background-color: #00627D;
+  opacity: 0.4;
+  display: inline-block;
+}
+.cat2{
+  position: relative;
+  top: 3px;
+  height: 15px;
+  width: 15px;
+  background-color: #149ECE;
+  opacity: 0.4;
+  display: inline-block;
+}
+.cat3{
+  position: relative;
+  top: 3px;
+  height: 15px;
+  width: 15px;
+  background-color: #00FFC5;
+  opacity: 0.4;
+  display: inline-block;
+}
 
 </style>
 <body class="application">
@@ -94,7 +147,17 @@ div.tooltip {
 <div class="row">
       <div class="col-md-7">
           <div class="chart-stage" id="map-container">
-            <div id="map"></div>
+            <div id="map">
+		<div id="ui-container" class="ui" style="z-index: 401">				
+				  <h4>LEGEND</h4>						  
+				  <span class="dot"></span><span class="legend_label">AGENCY LOCATIONS</span>							
+				  <br/>
+				<h5><u>FEMA 2007 EFFECTIVE FIRM</u></h5>						
+				<span class="cat1"></span><span class="legend_label">ZONE VE (HIGH RISK: FLOODING AND WAVES)</span><br/>
+				<span class="cat2"></span><span class="legend_label">ZONES AE/A (HIGH RISK: FLOODING)</span><br/>
+				<span class="cat3"></span><span class="legend_label">ZONE X (MODERATE RISK: FLOODING)</span>						
+		</div>
+	    </div>
           </div>
       </div>
           <div class="col-md-5">		  
@@ -6377,6 +6440,7 @@ div.tooltip {
 <script type="text/javascript" src="gagiks-jquery-tbltree-bec285e/js/jquery.tbltree.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/v/dt/dt-1.10.12/r-2.1.0/se-1.2.0/datatables.min.js"></script>
 <script src="jquery-cookie-master/src/jquery.cookie.js"></script>
+<script src="LeafletAjax/leaflet.ajax.min.js"></script>
 <script>
 $(document).ready(function(){
 	$("#riskTable").tbltree();
@@ -6459,6 +6523,17 @@ $(document).ready(function(){
 	var latlong = [];
 	var selection = [];
 var map = L.map('map').setView([40.706813, -73.997629], 15);
+			  
+var firm2007 = new L.GeoJSON.AJAX("data/Effective_FIRMs_2007.geojson",{
+	style: function(feature){
+		switch (feature.properties.ZONES){
+			case 'ZONE VE (High Risk: Flooding and Waves)': return {pointerEvents: "none", fillColor: "#00627D", fillOpacity: 0.3, color:""};
+			case 'ZONES AE/A (High Risk: Flooding)': return {pointerEvents: "none", fillColor: "#149ECE", fillOpacity: 0.3, color:""};
+			case 'ZONE X (Moderate Risk: Flooding)': return {pointerEvents: "none", fillColor: "#00FFC5", fillOpacity: 0.3, color:""};
+		}
+	}
+});
+firm2007.addTo(map);
 
 L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 var tooltip = d3.select('body').append('div')
