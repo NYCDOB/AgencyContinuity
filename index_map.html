@@ -152,10 +152,10 @@ div.tooltip {
 				  <h4>LEGEND</h4>						  
 				  <span class="dot"></span><span class="legend_label">AGENCY LOCATIONS</span>							
 				  <br/>
-				<h5><u>FEMA 2007 EFFECTIVE FIRM</u></h5>						
-				<span class="cat1"></span><span class="legend_label">ZONE VE (HIGH RISK: FLOODING AND WAVES)</span><br/>
-				<span class="cat2"></span><span class="legend_label">ZONES AE/A (HIGH RISK: FLOODING)</span><br/>
-				<span class="cat3"></span><span class="legend_label">ZONE X (MODERATE RISK: FLOODING)</span>						
+						<h5><u>FEMA 2015 PRELIMINARY FIRM</u></h5>						
+						<span class="cat1"></span><span class="legend_label">ZONE VE (HIGH RISK: FLOODING AND WAVES)</span><br/>
+						<span class="cat2"></span><span class="legend_label">ZONES A/AE/O (HIGH RISK: FLOODING)</span><br/>
+						<span class="cat3"></span><span class="legend_label">ZONE X (MODERATE RISK: FLOODING)</span>						
 		</div>
 	    </div>
           </div>
@@ -6524,16 +6524,27 @@ $(document).ready(function(){
 	var selection = [];
 var map = L.map('map').setView([40.706813, -73.997629], 15);
 			  
-var firm2007 = new L.GeoJSON.AJAX("data/Effective_FIRMs_2007.geojson",{
+<!-- var firm2007 = new L.GeoJSON.AJAX("data/Effective_FIRMs_2007.geojson",{ -->
+	<!-- style: function(feature){ -->
+		<!-- switch (feature.properties.ZONES){ -->
+			<!-- case 'ZONE VE (High Risk: Flooding and Waves)': return {pointerEvents: "none", fillColor: "#00627D", fillOpacity: 0.3, color:""}; -->
+			<!-- case 'ZONES AE/A (High Risk: Flooding)': return {pointerEvents: "none", fillColor: "#149ECE", fillOpacity: 0.3, color:""}; -->
+			<!-- case 'ZONE X (Moderate Risk: Flooding)': return {pointerEvents: "none", fillColor: "#00FFC5", fillOpacity: 0.3, color:""}; -->
+		<!-- } -->
+	<!-- } -->
+<!-- }); -->
+<!-- firm2007.addTo(map); -->
+
+var firm2015 = new L.GeoJSON.AJAX("https://nycdob.github.io/FIRMs/data/Preliminary_FIRMs_2015.geojson",{
 	style: function(feature){
 		switch (feature.properties.ZONES){
 			case 'ZONE VE (High Risk: Flooding and Waves)': return {pointerEvents: "none", fillColor: "#00627D", fillOpacity: 0.3, color:""};
-			case 'ZONES AE/A (High Risk: Flooding)': return {pointerEvents: "none", fillColor: "#149ECE", fillOpacity: 0.3, color:""};
+			case 'ZONE A/AE/AO (High Risk: Flooding)': return {pointerEvents: "none", fillColor: "#149ECE", fillOpacity: 0.3, color:""};
 			case 'ZONE X (Moderate Risk: Flooding)': return {pointerEvents: "none", fillColor: "#00FFC5", fillOpacity: 0.3, color:""};
 		}
 	}
 });
-firm2007.addTo(map);
+firm2015.addTo(map);
 
 L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
 var tooltip = d3.select('body').append('div')
