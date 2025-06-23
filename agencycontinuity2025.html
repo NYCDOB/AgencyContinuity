@@ -13,7 +13,8 @@
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
 <script src="https://nycdob.github.io/EssentialActiveConstruction/Leaflet.D3SvgOverlay-master/L.D3SvgOverlay.min.js"></script>
-<script type="text/javascript" src="leaflet.ajax.js"></script>
+<!-- <script type="text/javascript" src="leaflet.ajax.js"></script> -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
 .addr + span  {
@@ -252,7 +253,7 @@ ul, li {
 <div class="_page"> 
         <header class="_header">
             <div>
-            <a href="https://www.nyc.gov/site/buildings/index.page" target="_blank" class="active"><img alt="DOB" src="./img/dob_logo_white_transparent.png" height="40" width="80"></a>
+            <a href="https://www.nyc.gov/site/buildings/index.page" target="_blank" class="active"><img alt="DOB" src="dob_logo_white_transparent.png" height="40" width="80"></a>
             </div>
             <div class="tle">Agency Continuity 2025</div>
             <!-- <div class="showhelp">Help</div> -->
@@ -295,9 +296,9 @@ ul, li {
 <script >
 const _maphome=[40.7416,-73.9985];
 var map = L.map('map',{zoomControl:false}).setView(_maphome, 12);
-	map.on('resize', function(){
+	//map.on('resize', function(){
 		//map.invalidateSize();	//****************************************	
-	});
+	//});
 var firm2015 = new L.GeoJSON.AJAX("https://nycdob.github.io/FIRMs/data/Preliminary_FIRMs_2015.geojson",{
 	style: function(feature){
 		switch (feature.properties.ZONES){
@@ -363,8 +364,8 @@ document.querySelector("#map > div.leaflet-control-container > div.leaflet-top.l
                                         // }, 1000)
                                         _x.closest("li:has(span.boro span)").querySelector("span").classList.add("treepointer-down");
                                         _x.closest("li:has(span.boro span)").scrollIntoView(true);
-                                        _x.closest("ul").classList.add("active");
-                                        _x.nextElementSibling.classList.add("active");
+                                        //_x.closest("ul").classList.add("active");
+                                        //_x.nextElementSibling.classList.add("active");
                                         }
                                 })
                             })
