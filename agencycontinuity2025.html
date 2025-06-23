@@ -297,7 +297,7 @@ ul, li {
 const _maphome=[40.7416,-73.9985];
 var map = L.map('map',{zoomControl:false}).setView(_maphome, 12);
 	//map.on('resize', function(){
-		//map.invalidateSize();	//****************************************	
+	//	map.invalidateSize();	//****************************************	
 	//});
 var firm2015 = new L.GeoJSON.AJAX("https://nycdob.github.io/FIRMs/data/Preliminary_FIRMs_2015.geojson",{
 	style: function(feature){
@@ -306,7 +306,8 @@ var firm2015 = new L.GeoJSON.AJAX("https://nycdob.github.io/FIRMs/data/Prelimina
 			case 'ZONE A/AE/AO (High Risk: Flooding)': return {pointerEvents: "none", fillColor: "#149ECE", fillOpacity: 0.3, color:""};
 			case 'ZONE X (Moderate Risk: Flooding)': return {pointerEvents: "none", fillColor: "#00FFC5", fillOpacity: 0.3, color:""};
 		}
-	},interactive:false
+	},
+    //interactive:false
 })
 firm2015.addTo(map);
 var points=null; // **********************************************************************
@@ -364,7 +365,7 @@ document.querySelector("#map > div.leaflet-control-container > div.leaflet-top.l
                                         // }, 1000)
                                         _x.closest("li:has(span.boro span)").querySelector("span").classList.add("treepointer-down");
                                         _x.closest("li:has(span.boro span)").scrollIntoView(true);
-                                        //_x.closest("ul").classList.add("active");
+                                        _x.closest("ul").classList.add("active");
                                         //_x.nextElementSibling.classList.add("active");
                                         }
                                 })
