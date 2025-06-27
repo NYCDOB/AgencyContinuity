@@ -386,8 +386,8 @@ const legendHTML=`<div id="ui-container" class="ui" style="z-index: 401">
                     unit:((e["UNIT"].trim()) ? e["UNIT"].trim().toUpperCase() : "<unit missing>" )  ,    
                     boro:((e["BORO NAME"].trim()) ? e["BORO NAME"].trim().toUpperCase() : "NA" ) ,
                     ln:((e["LAST NAME"].trim()) ? e["LAST NAME"].trim() : "unknown" ) , 
-                    fullname:(( e["LAST NAME"].trim()) ? e["FIRST NAME"].trim().concat(" ",e["LAST NAME"].trim()) : "<name missing>" ) , 
-                    lnfn:e["LAST NAME"].trim().concat(" ",e["FIRST NAME"].trim()) , 
+                    fullname:(( e["LAST NAME"].trim()) ? e["FIRST NAME"].trim().concat(" ",e["LAST NAME"].trim()):(e["EMPLOYEE ID #"].trim()?`ID: ${e["EMPLOYEE ID #"].trim()}`:"missing name and id")),
+                    lnfn:e["LAST NAME"].trim().concat(" ",e["FIRST NAME"].trim(),e["HC"]) , 
                     addr:( !e["LOCATION"].trim() || e["LOCATION"].trim().toLowerCase()=="na") ? "**Missing Address**" :  e["LOCATION"].trim().toUpperCase(),
                 }
             })
