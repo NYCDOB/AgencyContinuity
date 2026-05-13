@@ -150,13 +150,14 @@
                 color: "#333",
                 weight: 0,
                 opacity: 0,
-                fillOpacity: 0.8,
+                fillOpacity: 1,
               });
               criticalmarkers.push(marker);
               return marker;
             },
             onEachFeature: function (feature, layer) {
               layer.bindPopup(
+                "<h6><b>Critical Facility</b></h6>" +
                 "<b>Name:</b> " +
                   feature.properties.Name +
                   "<br/>" +
@@ -399,8 +400,11 @@
             .on("click", function (d) {
               d3.event.stopPropagation();
               let _numemployees = addrct.get(d.Address.toUpperCase());
-              map.openPopup(
-                `ADDRESS: ${d.Address.toUpperCase()}, ${d.Borough}<br>NUMBER OF EMPLOYEES: ${_numemployees}`,
+              map.openPopup(`
+              <H6><B>Agency Location</b></H6>
+                  <b>Address</b>: ${d.Address.toUpperCase()}, ${d.Borough}
+                  <br>
+                  <b>Number of Employees</b>: ${_numemployees}`,
                 d.latLng,
                 { autoPan: true, autoPanPadding: [20, 20] },
               );
