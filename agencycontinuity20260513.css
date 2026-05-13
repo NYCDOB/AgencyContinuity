@@ -347,6 +347,7 @@ div.geojsoncolors {
   pointer-events: none;
 }
 .legendstuff {
+  padding-left: 10px;
   overflow: hidden;
   max-height: 900px;
   opacity: 1;

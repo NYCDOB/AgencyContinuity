@@ -305,34 +305,19 @@
         <span class="legendcontrol_"  style="
         cursor: pointer;
         color: #9f9f9f;
-        zzzwidth: 30px;
-        zzzheight: 30px;
-        zzzdisplay: flex;
-        zzzalign-items: center;
-        zzzjustify-content: center;
-        zzzfont-size: 14px;
-        zzzfont-weight: bold;
         align-self: flex-start;
         margin-top: -10px;  
         ">▼</span> 
         <span class="visually-hidden" id="legendA11yText">Hide legend</span>
         </div>
+
+
         <div  class="legendstuff opened">
-        <div class="form-check form-switch">
-        <input
-        class="form-check-input d3PointsLayer"
-        type="checkbox"
-        role="switch"
-        id="flexSwitchCheckDefaulta" 
-        checked
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefaulta"
-        >Agency Locations</label
-        >
-        </div>
+        
         <span class="legendcolorcircles" style="background-color: #ffaa00"> </span
-        ><span class="legend_label">Location</span><br />
-        <br />
+        ><span class="legend_label"style="font-size:14.4px">AGENCY LOCATIONS</span><br />
+
+        <hr>
         <div class="form-check form-switch">
         <input
         class="form-check-input facilities"
@@ -341,7 +326,7 @@
         id="flexSwitchCheckDefaultb" 
         />
         <label class="form-check-label" for="flexSwitchCheckDefaultb"
-        >Critical Facilities</label
+        >CRITICAL FACILITIES</label
         >
         </div>
         <span class="legendcolorcircles hospital"> </span
@@ -354,7 +339,6 @@
         ><span class="legend_label">Adult Care Facility</span><br />
         <span class="legendcolorcircles psychiatric"></span
         ><span class="legend_label">Psychiatric Facility</span><br />
-        <br />
         <hr />
         <div class="geojsoncolors">
         <input type="radio" id="firm" name="mylayer" checked />
@@ -393,71 +377,69 @@
         return div;
       };
       legend.addTo(map);
+      d3.csv("data/AgencyContinuityLocs_20250605.csv", function (e) {
+        points = e.map(function (d) {
+          d.latLng = [+d.Lat, +d.Lon];
+          return d;
+        });
 
+        let currentSel = null;
+        let currentProj = null;
 
-d3.csv("data/AgencyContinuityLocs_20250605.csv", function (e) {
-  points = e.map(function (d) {
-    d.latLng = [+d.Lat, +d.Lon];
-    return d;
-  });
-
-  let currentSel = null;
-  let currentProj = null;
-
-  var pointsOverlay = L.d3SvgOverlay(function (sel, proj) {
-    currentSel = sel;
-    currentProj = proj;
-    var pointsUpd = sel.selectAll("circle").data(points);
-    pointsUpd.enter()
-      .append("circle")
-      .attr("class", "point")
-      .style("pointer-events", "all")
-      .attr("fill", "#FFAA00")
-      .on("click", function (d) {
-        d3.event.stopPropagation();
-        let _numemployees = addrct.get(d.Address.toUpperCase());
+        var pointsOverlay = L.d3SvgOverlay(function (sel, proj) {
+          currentSel = sel;
+          currentProj = proj;
+          var pointsUpd = sel.selectAll("circle").data(points);
+          pointsUpd
+            .enter()
+            .append("circle")
+            .attr("class", "point")
+            .style("pointer-events", "all")
+            .attr("fill", "#FFAA00")
+            .on("click", function (d) {
+              d3.event.stopPropagation();
+              let _numemployees = addrct.get(d.Address.toUpperCase());
               map.openPopup(
                 `ADDRESS: ${d.Address.toUpperCase()}, ${d.Borough}<br>NUMBER OF EMPLOYEES: ${_numemployees}`,
                 d.latLng,
                 { autoPan: true, autoPanPadding: [20, 20] },
               );
-      })
-      .on("mouseover", function () {
-        d3.select(this).style("fill", "#FFDE21");
-      })
-      .on("mouseout", function () {
-        d3.select(this).style("fill", "#FFAA00");
-      });
-    pointsUpd
-      .attr("cx", d => proj.latLngToLayerPoint(d.latLng).x)
-      .attr("cy", d => proj.latLngToLayerPoint(d.latLng).y)
-      .attr("r", () => 5 / proj.scale);
-  }).addTo(map);
+            })
+            .on("mouseover", function () {
+              d3.select(this).style("fill", "#FFDE21");
+            })
+            .on("mouseout", function () {
+              d3.select(this).style("fill", "#FFAA00");
+            });
+          pointsUpd
+            .attr("cx", (d) => proj.latLngToLayerPoint(d.latLng).x)
+            .attr("cy", (d) => proj.latLngToLayerPoint(d.latLng).y)
+            .attr("r", () => 5 / proj.scale);
+        }).addTo(map);
 
-
-  map.on("moveend", () => {
-    if (!currentSel || !currentProj) return;
-    currentSel.selectAll("circle")
-      .transition()
-      .duration(200)
-      .attr("cx", d => currentProj.latLngToLayerPoint(d.latLng).x)
-      .attr("cy", d => currentProj.latLngToLayerPoint(d.latLng).y)
-      .attr("r", () => {
-        const z = map.getZoom();
-        return 5 / currentProj.scale;
-      });
-  });
-});
-
-
-        const pointToggle = document.querySelector(".d3PointsLayer");
-        pointToggle.addEventListener("click", (e) => {
-          if (e.currentTarget.checked) {
-            map.addLayer(pointsOverlay);
-          } else {
-            map.removeLayer(pointsOverlay);
-          }
+        map.on("moveend", () => {
+          if (!currentSel || !currentProj) return;
+          currentSel
+            .selectAll("circle")
+            .transition()
+            .duration(200)
+            .attr("cx", (d) => currentProj.latLngToLayerPoint(d.latLng).x)
+            .attr("cy", (d) => currentProj.latLngToLayerPoint(d.latLng).y)
+            .attr("r", () => {
+              const z = map.getZoom();
+              return 5 / currentProj.scale;
+            });
         });
+      });
+
+      // const pointToggle = document.querySelector(".d3PointsLayer");  //toggle agency locations
+      // pointToggle.addEventListener("click", (e) => {
+      //   if (e.currentTarget.checked) {
+      //     map.addLayer(pointsOverlay);
+      //   } else {
+      //     map.removeLayer(pointsOverlay);
+      //   }
+      // });
 
       const mylayerRadios = document.querySelectorAll('input[name="mylayer"]');
       mylayerRadios.forEach((x) =>
