@@ -216,11 +216,6 @@
           }[category] || "#999"
         );
       }
-
-
-
-
-
       //var firmlayer = L.layerGroup();
       fetch(
         "https://nycdob.github.io/FIRMs/data/Preliminary_FIRMs_2015.geojson",
@@ -310,27 +305,24 @@
             interactive: false,
           }).addTo(map);
         });
-
-
-
       var cblayer = L.layerGroup();
       fetch(
         "data/cb_data.json",
       )
         .then((res) => res.json())
         .then((data) => {
-
-
-var categories={HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0}
-for (prop in categories) { 
-    let tot=0
-        for (x of data.features) {
-            tot += x.properties[""+ prop+""] 
-        }
-    categories[prop] = tot
-}
-
-
+          var categories={HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0}
+          for (x of data.features){
+            categories['HIGH'] += x.properties.HIGH
+            categories['MED'] += x.properties.MED
+            categories['LOW'] += x.properties.LOW
+            categories['ZONE1'] += x.properties.ZONE1
+            categories['ZONE2'] += x.properties.ZONE2
+            categories['ZONE3'] += x.properties.ZONE3
+            categories['ZONE4'] += x.properties.ZONE4
+            categories['ZONE5'] += x.properties.ZONE5
+            categories['ZONE6'] += x.properties.ZONE6
+          }
           var cb = L.geoJson(data, {
             style:  {
                     pointerEvents: "none",
@@ -338,52 +330,12 @@ for (prop in categories) {
                     weight:1,
                     color: "#9197AE",
                   }, 
-         		onEachFeature: function (feature, layer) {
-                        cbpopop=()=>{return `
-<div style="font-size:.70rem;">
-<h6 style="font-weight:bolder;">Community District <span style="text-decoration:underline">${feature.properties.boro_cd}</span> Properties</h6><br>
-<div style="display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Flood Risk (FIRM)</span><br>
-<span class="badge rounded-pill fs-6 cat1" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>High VE: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp${feature.properties.HIGH}</span><span style="font-size:.7em">(${categories.HIGH})</span>
-</span>
-<span class="badge rounded-pill fs-6 cat2" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>High A/AE/O:&nbsp &nbsp &nbsp &nbsp ${feature.properties.MED}</span><span style="font-size:.7em">(${categories.MED})</span>
-</span>
-<span class="badge rounded-pill fs-6 cat3" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Moderate (< 2%): &nbsp${feature.properties.LOW}</span><span style="font-size:.7em">(${categories.LOW})</span>
-</span>
-</div>
-<hr>
-<div style="color: black; display:flex;flex-direction:column;">
-<span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Evacuation Zones</span>
-<br>
-<span class="badge rounded-pill fs-6 evac1" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 1: &nbsp &nbsp${feature.properties.ZONE1}</span><span style="font-size:.7em">(${categories.ZONE1})</span>
-</span>
-<span class="badge rounded-pill fs-6 evac2" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 2: &nbsp &nbsp${feature.properties.ZONE2}</span><span style="font-size:.7em">(${categories.ZONE2})</span>
-</span>
-<span class="badge rounded-pill fs-6 evac3" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 3: &nbsp &nbsp${feature.properties.ZONE3}</span><span style="font-size:.7em">(${categories.ZONE3})</span>
-</span>
-<span class="badge rounded-pill fs-6 evac4" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 4: &nbsp &nbsp${feature.properties.ZONE4}</span><span style="font-size:.7em">(${categories.ZONE4})</span>
-</span>
-<span class="badge rounded-pill fs-6 evac5" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 5: &nbsp &nbsp${feature.properties.ZONE5}</span><span style="font-size:.7em">(${categories.ZONE5})</span>
-</span>
-<span class="badge rounded-pill fs-6 evac6" style="margin-bottom:5px;display:flex;justify-content: space-between;">
-<span>Zone 6: &nbsp &nbsp${feature.properties.ZONE6}</span><span style="font-size:.7em">(${categories.ZONE6})</span>
-</span>      
-<div style="margin-left:auto">(Total Properties Citywide)</div>
-</div>
-</div>
-                        `};
-
+                  onEachFeature: function (feature, layer) {
+                      cbpopop=()=>{return `<div style="font-size:.70rem;"><h6 style="font-weight:bolder;">Community District <span style="text-decoration:underline">${feature.properties.boro_cd}</span> Properties</h6><br><div style="display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Flood Risk (FIRM)</span><br><span class="badge rounded-pill fs-6 cat1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High VE: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp${feature.properties.HIGH}</span><span style="font-size:.7em">(${categories.HIGH})</span></span><span class="badge rounded-pill fs-6 cat2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High A/AE/O:&nbsp &nbsp &nbsp &nbsp ${feature.properties.MED}</span><span style="font-size:.7em">(${categories.MED})</span></span><span class="badge rounded-pill fs-6 cat3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Moderate (< 2%): &nbsp${feature.properties.LOW}</span><span style="font-size:.7em">(${categories.LOW})</span></span></div><hr><div style="color: black; display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Evacuation Zones</span><br><span class="badge rounded-pill fs-6 evac1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 1: &nbsp &nbsp${feature.properties.ZONE1}</span><span style="font-size:.7em">(${categories.ZONE1})</span></span><span class="badge rounded-pill fs-6 evac2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 2: &nbsp &nbsp${feature.properties.ZONE2}</span><span style="font-size:.7em">(${categories.ZONE2})</span></span><span class="badge rounded-pill fs-6 evac3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 3: &nbsp &nbsp${feature.properties.ZONE3}</span><span style="font-size:.7em">(${categories.ZONE3})</span></span><span class="badge rounded-pill fs-6 evac4" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 4: &nbsp &nbsp${feature.properties.ZONE4}</span><span style="font-size:.7em">(${categories.ZONE4})</span></span><span class="badge rounded-pill fs-6 evac5" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 5: &nbsp &nbsp${feature.properties.ZONE5}</span><span style="font-size:.7em">(${categories.ZONE5})</span></span><span class="badge rounded-pill fs-6 evac6" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 6: &nbsp &nbsp${feature.properties.ZONE6}</span><span style="font-size:.7em">(${categories.ZONE6})</span></span>      <div style="margin-left:auto">(Total Properties Citywide)</div></div></div>`};
 				              layer.bindPopup(cbpopop);
-				             layer.bindTooltip(`CD ${feature.properties.boro_cd}`);
+				              layer.bindTooltip(`CD ${feature.properties.boro_cd}`);
                       layer.on('mouseover',function(){
-                          layer.setStyle({fillColor:"#bcbddc",weight:2,color:"#787a7a"})
+                      layer.setStyle({fillColor:"#bcbddc",weight:2,color:"#787a7a"})
                       });
                       layer.on('mouseout',function(){
                           layer.setStyle({fillColor:"#fff",weight:1,color:"#9197AE"})
@@ -395,23 +347,6 @@ for (prop in categories) {
             }).addTo(cblayer);
         });  
         map.addLayer(cblayer);
-
-        //{"OBJECTID":71,
-        // "shape_leng":110668.506228,
-        // "boro_cd":228,
-        // "Shape_Le_1":110665.629297,
-        // "Shape_Area":91921002.7186,
-        // "HIGH":1,
-        // "MED":79,
-        // "LOW":3,
-        // "ZONE1":10,"ZONE2":74,"ZONE3":84,"ZONE4":91,
-        // "ZONE5":99,
-        // "ZONE6":110}}
-
-// cbpopop=`
-// <H4>Community District: ${feature.properties.boro_cd}</h4>
-// `;
-        
 
       var points = null;
       L.tileLayer(
