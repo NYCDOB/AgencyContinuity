@@ -154,7 +154,7 @@
 
       var criticalmarkers = [];
       var facilitieslayer = L.layerGroup();
-      fetch("CriticalFacilities.json")
+      fetch("data/CriticalFacilities.json")
         .then((res) => res.json())
         .then((data) => {
           var criticalmarkers = [];
@@ -305,6 +305,11 @@
             interactive: false,
           }).addTo(map);
         });
+
+
+
+map.createPane('cbbackgroundpane');
+map.getPane('cbbackgroundpane').style.zIndex=300;
       var cblayer = L.layerGroup();
       fetch(
         "data/cb_data.json",
@@ -324,6 +329,9 @@
             categories['ZONE6'] += x.properties.ZONE6
           }
           var cb = L.geoJson(data, {
+
+            pane:'cbbackgroundpane',
+
             style:  {
                     pointerEvents: "none",
                     fillColor: "#fff",
@@ -333,9 +341,13 @@
                   onEachFeature: function (feature, layer) {
                       cbpopop=()=>{return `<div style="font-size:.70rem;"><h6 style="font-weight:bolder;">Community District <span style="text-decoration:underline">${feature.properties.boro_cd}</span> Properties</h6><br><div style="display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Flood Risk (FIRM)</span><br><span class="badge rounded-pill fs-6 cat1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High VE: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp${feature.properties.HIGH}</span><span style="font-size:.7em">(${categories.HIGH})</span></span><span class="badge rounded-pill fs-6 cat2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High A/AE/O:&nbsp &nbsp &nbsp &nbsp ${feature.properties.MED}</span><span style="font-size:.7em">(${categories.MED})</span></span><span class="badge rounded-pill fs-6 cat3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Moderate (< 2%): &nbsp${feature.properties.LOW}</span><span style="font-size:.7em">(${categories.LOW})</span></span></div><hr><div style="color: black; display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Evacuation Zones</span><br><span class="badge rounded-pill fs-6 evac1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 1: &nbsp &nbsp${feature.properties.ZONE1}</span><span style="font-size:.7em">(${categories.ZONE1})</span></span><span class="badge rounded-pill fs-6 evac2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 2: &nbsp &nbsp${feature.properties.ZONE2}</span><span style="font-size:.7em">(${categories.ZONE2})</span></span><span class="badge rounded-pill fs-6 evac3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 3: &nbsp &nbsp${feature.properties.ZONE3}</span><span style="font-size:.7em">(${categories.ZONE3})</span></span><span class="badge rounded-pill fs-6 evac4" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 4: &nbsp &nbsp${feature.properties.ZONE4}</span><span style="font-size:.7em">(${categories.ZONE4})</span></span><span class="badge rounded-pill fs-6 evac5" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 5: &nbsp &nbsp${feature.properties.ZONE5}</span><span style="font-size:.7em">(${categories.ZONE5})</span></span><span class="badge rounded-pill fs-6 evac6" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 6: &nbsp &nbsp${feature.properties.ZONE6}</span><span style="font-size:.7em">(${categories.ZONE6})</span></span>      <div style="margin-left:auto">(Total Properties Citywide)</div></div></div>`};
 				              layer.bindPopup(cbpopop);
-				              layer.bindTooltip(`CD ${feature.properties.boro_cd}`);
+				              layer.bindTooltip(`CD ${feature.properties.boro_cd}`,{
+                        sticky:true,
+                        interactive:false,
+                        opacity:0.9,
+                      });
                       layer.on('mouseover',function(){
-                      layer.setStyle({fillColor:"#bcbddc",weight:2,color:"#787a7a"})
+                          layer.setStyle({fillColor:"#bcbddc",weight:2,color:"#787a7a"})
                       });
                       layer.on('mouseout',function(){
                           layer.setStyle({fillColor:"#fff",weight:1,color:"#9197AE"})
@@ -346,7 +358,11 @@
 		            	}
             }).addTo(cblayer);
         });  
-        map.addLayer(cblayer);
+       map.addLayer(cblayer);
+
+
+
+
 
       var points = null;
       L.tileLayer(
@@ -442,9 +458,10 @@
           return d;
         });
 
+
+
         let currentSel = null;
         let currentProj = null;
-
         var pointsOverlay = L.d3SvgOverlay(function (sel, proj) {
           currentSel = sel;
           currentProj = proj;
@@ -478,6 +495,8 @@
             .attr("cy", (d) => proj.latLngToLayerPoint(d.latLng).y)
             .attr("r", () => 5 / proj.scale);
         }).addTo(map);
+
+
 
         map.on("moveend", () => {
           if (!currentSel || !currentProj) return;
