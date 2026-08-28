@@ -1,5 +1,5 @@
 :root {
- --backgroundOpacity: 50%; 
+ --backgroundOpacity: 100%; 
 }
 .badge {
   color: #292929 !important;
@@ -154,11 +154,12 @@ li {
   font-size: 0.85rem;
 }
 .point {
-  fill: #ffaa00;
-  zzzfill-opacity: 0.8;
+  fill: #0707ff;
   cursor: pointer;
-  z-index: 999;
-}
+  z-index: 9999;
+  color: #0707ff;
+}  
+
 .treepointer {
   cursor: pointer;
   -webkit-user-select: none; /* Safari 3.1+ */
@@ -223,7 +224,6 @@ li {
   background-color: #fff;
   border: 2px solid #707070;
   border-radius: 7px;
-  zzzwidth: 30em;
 }
 
 .legend-control {
@@ -271,7 +271,8 @@ li {
 
 .cat1 {
   /* background-color: #00627d; */
-  background-color: rgb(from #00627d r g b / var(--backgroundOpacity))
+  /* background-color: rgb(from #00627d r g b / var(--backgroundOpacity)) */
+  background-color: rgb(from #00627d r g b / 50% )
   
 }
 .cat2 {
@@ -287,28 +288,28 @@ li {
 
 
 .evac1 {
-  background-color: #004c73;
-    background-color: rgb(from #004c73 r g b / var(--backgroundOpacity));
+  background-color: rgb(255, 0, 0);
+    background-color: rgb(255 0 0  / var(--backgroundOpacity));
 }
 .evac2 {
-  background-color: #0084a8;
-    background-color: rgb(from #0084a8 r g b / var(--backgroundOpacity));
+  background-color: #f03b20;
+    background-color: rgb(from #f03b20 r g b / var(--backgroundOpacity));
 }
 .evac3 {
-  background-color: #00A9E6;
-    background-color: rgb(from #00A9E6 r g b / var(--backgroundOpacity));
+  background-color: #fd8d3c;
+    background-color: rgb(from #fd8d3c r g b / var(--backgroundOpacity));
 }
 .evac4 {
-  background-color: #00c5ff;
-    background-color: rgb(from #00c5ff r g b / var(--backgroundOpacity));
+  background-color: #feb24c;
+    background-color: rgb(from #feb24c r g b / var(--backgroundOpacity));
 }
 .evac5 {
-  background-color: #73dfff;
-    background-color: rgb(from #73dfff r g b / var(--backgroundOpacity));
+  background-color: #fed976;
+    background-color: rgb(from #fed976 r g b / var(--backgroundOpacity));
 }
 .evac6 {
-  background-color: #bee8ff;
-    background-color: rgb(from #bee8ff r g b / var(--backgroundOpacity));
+  background-color: #ffffb2;
+    background-color: rgb(from #ffffb2 r g b / var(--backgroundOpacity));
 }
 
 .legendcolorcircles {
