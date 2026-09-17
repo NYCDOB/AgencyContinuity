@@ -16,7 +16,7 @@
     <link
       rel="stylesheet"
       type="text/css"
-      href="agencycontinuity20260819.css"
+      href="agencycontinuity20260902.css"
     />
     <link
       rel="stylesheet"
@@ -28,19 +28,11 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
-
     <!-- <script src="https://nycdob.github.io/EssentialActiveConstruction/Leaflet.D3SvgOverlay-master/L.D3SvgOverlay.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/leaflet-d3-svg-overlay@2.2.0/L.D3SvgOverlay.min.js"></script>
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-
     <style></style>
   </head>
   <body>
@@ -64,12 +56,12 @@
 
 <dialog id="favDialog">
 <form method="dialog">
-<p>Lucky number is: <strong id="number"></strong></p>
-<button>Close dialog</button>
+<div>Layers: Toggle Firm / Evacuations Zones in Legend/Controls section</div>
+<div>Boro / CD: Select view from Map control in top right of map</div>
+<div >Critical Facilities: Toggle on/off in Legend/Controls section</div><br>
+<div style="text-align: center;"><button>Close</button></div>
 </form>
 </dialog>
-
-
       </header>
       <main class="_main">
         <!-- <div id="sidebar"></div> -->
@@ -151,16 +143,27 @@
     <script>
       const _maphome = [40.7416, -73.9985];
       const _mapinitizoom = 11;
-      var map = L.map("map", {
-        zoomControl: false,
-      }).setView(_maphome, _mapinitizoom);
-
-
+      var clickedondatalayer=false;
+      var citymetrics={HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,"Hospital":0,"Psych Facility":0,"Nursing Home":0,"Dialysis":0,"Adult Care":0};
+      var borometrics={
+      1:{HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,Hospital:0,"Psych Facility":0,"Nursing Home":0,Dialysis:0,"Adult Care":0},
+      2:{HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,Hospital:0,"Psych Facility":0,"Nursing Home":0,Dialysis:0,"Adult Care":0},
+      3:{HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,Hospital:0,"Psych Facility":0,"Nursing Home":0,Dialysis:0,"Adult Care":0},
+      4:{HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,Hospital:0,"Psych Facility":0,"Nursing Home":0,Dialysis:0,"Adult Care":0},
+      5:{HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0,Hospital:0,"Psych Facility":0,"Nursing Home":0,Dialysis:0,"Adult Care":0},
+      }
       var criticalmarkers = [];
       var facilitieslayer = L.layerGroup();
-      fetch("data/CriticalFacilities.json")
+      // fetch("data/CriticalFacilities.json")
+      fetch("https://nycdob.github.io/AgencyContinuity/data/CriticalFacilities.json")
         .then((res) => res.json())
         .then((data) => {
+          let boros=["MANHATTAN","BRONX","BROOKLYN","QUEENS","STATEN ISLAND"];
+          for (x of data.features){
+            let theindex = boros.indexOf(x.properties.Borough.toUpperCase()) + 1  || 1;
+            borometrics[theindex][x.properties.Category]+=1;
+            citymetrics[x.properties.Category] += 1
+          }
           var criticalmarkers = [];
           facilities = L.geoJson(data, {
             pointToLayer: function (feature, latlng) {
@@ -177,22 +180,23 @@
             },
             onEachFeature: function (feature, layer) {
               layer.bindPopup(
-                "<h6><b>Critical Facility</b></h6>" +
+                // "<div style='outline:1px solid gray;padding:3px;'><h6><b>Critical Facility</b></h6>" +
+                `<div style='outline:1px solid gray;padding:3px;'><h6><b>Type: ${feature.properties.Category}</b></h6>` +
                 "<b>Name:</b> " +
                   feature.properties.Name +
                   "<br/>" +
-                  "<b>Category:</b> " +
-                  feature.properties.Category +
-                  "<br/>" +
                   "<b>Address:</b> " +
                   feature.properties.Address +
-                  "<br/>",
+                  "<br/></div>",
               );
             },
           }).addTo(facilitieslayer);
         });
 
-
+      var map = L.map("map", {
+        zoomControl: false,
+        // layers:[facilitieslayer],
+      }).setView(_maphome, _mapinitizoom);
       function getRadius(zoom, radiustype) {
         switch (radiustype) {
           case "clamp":
@@ -255,9 +259,6 @@
             interactive: false,
           }).addTo(map);
         });
-
-
-
       fetch(
         // "https://nycdob.github.io/HurricaneZones/data/HurricaneInundationByEvacuationZone_filtered.geojson",
         "https://nycdob.github.io/AgencyContinuity/data/Hurricane_Evacuation_Zones_20260826.geojson",
@@ -303,11 +304,12 @@
                     fillOpacity: 0,
                   };
                 case "6":
-                  return { fillColor: "#ffffb2", 
+                  // return { fillColor: "#ffffb2", 
+                  return { fillColor: "#FDEE00", 
                   color: "", fillOpacity: 0 };
                 default:{
                   return {
-                    fillColor: "transparent", 
+fillColor: "transparent", 
                     color: "",
                   }
                 }
@@ -318,63 +320,139 @@
         });
 
 
-
-map.createPane('cbbackgroundpane');
-map.getPane('cbbackgroundpane').style.zIndex=300;
-      var cblayer = L.layerGroup();
+//begin boro layer
+      var borolayer = L.layerGroup();
       fetch(
-        "data/cb_data.json",
+        // "data/Borough_Boundaries.geojson",
+        "https://nycdob.github.io/AgencyContinuity/data/Borough_Boundaries.geojson",
       )
         .then((res) => res.json())
         .then((data) => {
-          var categories={HIGH:0,MED:0,LOW:0,ZONE1:0,ZONE2:0,ZONE3:0,ZONE4:0,ZONE5:0,ZONE6:0}
-          for (x of data.features){
-            categories['HIGH'] += x.properties.HIGH
-            categories['MED'] += x.properties.MED
-            categories['LOW'] += x.properties.LOW
-            categories['ZONE1'] += x.properties.ZONE1
-            categories['ZONE2'] += x.properties.ZONE2
-            categories['ZONE3'] += x.properties.ZONE3
-            categories['ZONE4'] += x.properties.ZONE4
-            categories['ZONE5'] += x.properties.ZONE5
-            categories['ZONE6'] += x.properties.ZONE6
-          }
-          var cb = L.geoJson(data, {
-
-            pane:'cbbackgroundpane',
-
+          var myboro = L.geoJson(data, {
             style:  {
                     pointerEvents: "none",
-                    fillColor: "#fff",
+                    fillColor: "#00000000",
                     weight:1,
-                    color: "#9197AE",
+                    color: "#737373",
                   }, 
                   onEachFeature: function (feature, layer) {
-                      cbpopop=()=>{return `<div style="font-size:.70rem;"><h6 style="font-weight:bolder;">Community District <span style="text-decoration:underline">${feature.properties.boro_cd}</span> Properties</h6><br><div style="display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Flood Risk (FIRM)</span><br><span class="badge rounded-pill fs-6 cat1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High VE: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp${feature.properties.HIGH}</span><span style="font-size:.7em">(${categories.HIGH})</span></span><span class="badge rounded-pill fs-6 cat2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High A/AE/O:&nbsp &nbsp &nbsp &nbsp ${feature.properties.MED}</span><span style="font-size:.7em">(${categories.MED})</span></span><span class="badge rounded-pill fs-6 cat3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Moderate (< 2%): &nbsp${feature.properties.LOW}</span><span style="font-size:.7em">(${categories.LOW})</span></span></div><hr><div style="color: black; display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Evacuation Zones</span><br><span class="badge rounded-pill fs-6 evac1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 1: &nbsp &nbsp${feature.properties.ZONE1}</span><span style="font-size:.7em">(${categories.ZONE1})</span></span><span class="badge rounded-pill fs-6 evac2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 2: &nbsp &nbsp${feature.properties.ZONE2}</span><span style="font-size:.7em">(${categories.ZONE2})</span></span><span class="badge rounded-pill fs-6 evac3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 3: &nbsp &nbsp${feature.properties.ZONE3}</span><span style="font-size:.7em">(${categories.ZONE3})</span></span><span class="badge rounded-pill fs-6 evac4" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 4: &nbsp &nbsp${feature.properties.ZONE4}</span><span style="font-size:.7em">(${categories.ZONE4})</span></span><span class="badge rounded-pill fs-6 evac5" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 5: &nbsp &nbsp${feature.properties.ZONE5}</span><span style="font-size:.7em">(${categories.ZONE5})</span></span><span class="badge rounded-pill fs-6 evac6" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 6: &nbsp &nbsp${feature.properties.ZONE6}</span><span style="font-size:.7em">(${categories.ZONE6})</span></span>      <div style="margin-left:auto">(Total Properties Citywide)</div></div></div>`};
-				              layer.bindPopup(cbpopop);
-				              layer.bindTooltip(`CD ${feature.properties.boro_cd}`,{
+                      // cbpopop=()=>{return `<div style="font-size:.70rem;"><h6 style="font-weight:bolder;">BOROUGH </div>`};
+				              // layer.bindPopup(cbpopop);
+				              layer.bindTooltip(`<h6>${feature.properties.boroname}</h6>`,{
                         sticky:true,
                         interactive:false,
                         opacity:0.9,
                       });
                       layer.on('mouseover',function(){
-                          layer.setStyle({fillColor:"#bcbddc",weight:2,color:"#787a7a"})
+                      // layer.setStyle({fillColor:"#bcbddc",weight:3,color:"#525252"})
+                      layer.setStyle({fillColor:"#bdbdbd",weight:3,color:"#737373"})
                       });
                       layer.on('mouseout',function(){
-                          layer.setStyle({fillColor:"#fff",weight:1,color:"#9197AE"})
+                          layer.setStyle({fillColor:"#00000000",weight:1,color:"#737373"})
                       });        
-                      layer.on('click',function(){
-                          layer.setStyle({fillColor:"#bcbddc",weight:1,color:"#dadaeb"})
+                      layer.on('click',function(e){
+                          L.DomEvent.stopPropagation(e); 
+                          clickedondatalayer=true;
+                          layer.setStyle({fillColor:"#bdbdbd",weight:3,color:"#737373"})
+                          dodata(borometrics[feature.properties.borocode],feature.properties.boroname,"",true);
+                      });  
+		            	}
+            }).addTo(borolayer);
+        });  
+      //  map.addLayer(borolayer);  //borolayer is a layer group
+//end boro layer
+
+// begin cb layer
+      var cblayer = L.layerGroup();
+      fetch(
+        "https://nycdob.github.io/AgencyContinuity/data/cb_data.json",
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          boros=['Manhattan','Brooklyn','Bronx','Queens','Staten Island'];
+            let theboro=null;
+          for (x of data.features){
+            citymetrics['HIGH'] += x.properties.HIGH;
+            citymetrics['MED'] += x.properties.MED;
+            citymetrics['LOW'] += x.properties.LOW;
+            citymetrics['ZONE1'] += x.properties.ZONE1;
+            citymetrics['ZONE2'] += x.properties.ZONE2;
+            citymetrics['ZONE3'] += x.properties.ZONE3;
+            citymetrics['ZONE4'] += x.properties.ZONE4;
+            citymetrics['ZONE5'] += x.properties.ZONE5;
+            citymetrics['ZONE6'] += x.properties.ZONE6;
+            theboro = x.properties.boro_cd.toString()[0];
+            borometrics[x.properties.boro_cd.toString()[0]]['HIGH'] +=x.properties.HIGH;
+            borometrics[x.properties.boro_cd.toString()[0]]['MED'] +=x.properties.MED;
+            borometrics[x.properties.boro_cd.toString()[0]]['LOW'] +=x.properties.LOW;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE1'] +=x.properties.ZONE1;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE2'] +=x.properties.ZONE2;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE3'] +=x.properties.ZONE3;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE4'] +=x.properties.ZONE4;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE5'] +=x.properties.ZONE5;
+            borometrics[x.properties.boro_cd.toString()[0]]['ZONE6'] +=x.properties.ZONE6;
+          }
+dodata(citymetrics,"Citywide","");
+          var cb = L.geoJson(data, {
+            style:  {
+                    pointerEvents: "none",
+                    fillColor: "#00000000",
+                    weight:1,
+                    color: "#737373", 
+                  }, 
+                  onEachFeature: function (feature, layer) {
+                      // cbpopop=()=>{return `<div style="font-size:.70rem;"><h6 style="font-weight:bolder;">Community District <span style="text-decoration:underline">${feature.properties.boro_cd}</span> Properties</h6><br><div style="display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Flood Risk (FIRM)</span><br><span class="badge rounded-pill fs-6 cat1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High VE: &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp${feature.properties.HIGH}</span><span style="font-size:.7em">(${citymetrics.HIGH})</span></span><span class="badge rounded-pill fs-6 cat2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>High A/AE/O:&nbsp &nbsp &nbsp &nbsp ${feature.properties.MED}</span><span style="font-size:.7em">(${citymetrics.MED})</span></span><span class="badge rounded-pill fs-6 cat3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Moderate (< 2%): &nbsp${feature.properties.LOW}</span><span style="font-size:.7em">(${citymetrics.LOW})</span></span></div><hr><div style="color: black; display:flex;flex-direction:column;"><span style="font-weight:bolder;font-size:1.3em;margin-left:25%">Evacuation Zones</span><br><span class="badge rounded-pill fs-6 evac1" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 1: &nbsp &nbsp${feature.properties.ZONE1}</span><span style="font-size:.7em">(${citymetrics.ZONE1})</span></span><span class="badge rounded-pill fs-6 evac2" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 2: &nbsp &nbsp${feature.properties.ZONE2}</span><span style="font-size:.7em">(${citymetrics.ZONE2})</span></span><span class="badge rounded-pill fs-6 evac3" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 3: &nbsp &nbsp${feature.properties.ZONE3}</span><span style="font-size:.7em">(${citymetrics.ZONE3})</span></span><span class="badge rounded-pill fs-6 evac4" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 4: &nbsp &nbsp${feature.properties.ZONE4}</span><span style="font-size:.7em">(${citymetrics.ZONE4})</span></span><span class="badge rounded-pill fs-6 evac5" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 5: &nbsp &nbsp${feature.properties.ZONE5}</span><span style="font-size:.7em">(${citymetrics.ZONE5})</span></span><span class="badge rounded-pill fs-6 evac6" style="margin-bottom:5px;display:flex;justify-content: space-between;"><span>Zone 6: &nbsp &nbsp${feature.properties.ZONE6}</span><span style="font-size:.7em">(${citymetrics.ZONE6})</span></span>      <div style="margin-left:auto">(Total Properties Citywide)</div></div></div>`};
+				              // layer.bindPopup(cbpopop);
+                    layer.bindTooltip(`<div>CD ${feature.properties.boro_cd}</div>`,{
+                        sticky:true,
+                        interactive:false,
+                        opacity:0.9,
+                      });
+                      layer.on('mouseover',function(){
+                          layer.setStyle({fillColor:"#bdbdbd",weight:3,color:"#737373"})
+                      });
+                        layer.on('mouseout',function(){
+                            layer.setStyle({fillColor:"#00000000",weight:1,color:"#737373"})
+                        });        
+                      layer.on('click',function(e){
+                                      L.DomEvent.stopPropagation(e); 
+                                      clickedondatalayer=true;
+                          layer.setStyle({fillColor:"#bdbdbd",weight:3,color:"#737373"});
+                         dodata(feature.properties, feature.properties.boro_cd,"Community District");
                       });  
 		            	}
             }).addTo(cblayer);
         });  
-       map.addLayer(cblayer);
+        map.addLayer(cblayer);  //cblayer is a layer group
+// end cb layer
 
+function dodata(dataobj=citymetrics,metricstring="Citywide",cdstring="Community District",convertit=false){
 
+let boros=["Manhattan","Bronx","Brooklyn","Queens","Staten Island"];
+  document.querySelector(".metrics .metricheading").textContent=`${cdstring} ${metricstring}`;
+  document.querySelector(".metrics .cat1 span:nth-of-type(even)").textContent=dataobj.HIGH;
+  document.querySelector(".metrics .cat2 span:nth-of-type(even)").textContent=dataobj.MED;
+  document.querySelector(".metrics .cat3 span:nth-of-type(even)").textContent=dataobj.LOW;
+  document.querySelector(".metrics .evac1 span:nth-of-type(even)").textContent=dataobj.ZONE1;
+  document.querySelector(".metrics .evac2 span:nth-of-type(even)").textContent=dataobj.ZONE2;
+  document.querySelector(".metrics .evac3 span:nth-of-type(even)").textContent=dataobj.ZONE3;
+  document.querySelector(".metrics .evac4 span:nth-of-type(even)").textContent=dataobj.ZONE4;
+  document.querySelector(".metrics .evac5 span:nth-of-type(even)").textContent=dataobj.ZONE5;
+  document.querySelector(".metrics .evac6 span:nth-of-type(even)").textContent=dataobj.ZONE6;
+  document.querySelector(".metrics .hospital span:nth-of-type(even)").textContent=dataobj.Hospital||"-";
+  document.querySelector(".metrics .dialysis span:nth-of-type(even)").textContent=dataobj.Dialysis||"-";
+  document.querySelector(".metrics .nursing  span:nth-of-type(even)").textContent=dataobj['Nursing Home']||"-";
+  document.querySelector(".metrics .adult  span:nth-of-type(even)").textContent=dataobj['Adult Care']||"-";
+  document.querySelector(".metrics .psychiatric span:nth-of-type(even)").textContent=dataobj["Psych Facility"]||"-";
+}
 
-
-
+var overlayMaps = {
+  "Community Districts": cblayer,
+  "Boroughs": borolayer ,
+}
+var layerControl = L.control.layers( overlayMaps,null, {collapsed:false,
+  
+}).addTo(map);
       var points = null;
       L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=cb1_27tu_1_978b0622efbf904b17d1bcc4",
@@ -384,78 +462,150 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
           updateWhenZooming: true,
           updateInterval: 20,
           attribution:
-            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            'Last Update: 9/17/26 | &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
         },
       ).addTo(map);
+
       L.control.zoom({ position: "topright" }).addTo(map);
       const legendHTML = `
-        <div class="ui leaflet-control" >
-        <div style="display: flex;justify-content: space-between; align-items: center">
-        <h2><b>LEGEND</b></h2>
-        <span class="legendcontrol_"  style="
+
+        <div class="ui" >
+
+<div
+  class="legendsection_">
+  <!--  legend section  -->
+  <div
+    class="metricssection controlsection" >
+    <h2>HIDE METRICS</h2>
+    <span
+      class="metricscontrol"
+      style="
         cursor: pointer;
         color: #9f9f9f;
         align-self: flex-start;
-        margin-top: -10px;  
-        ">▼</span> 
-        <span class="visually-hidden" id="legendA11yText">Hide legend</span>
-        </div>
-        <div  class="legendstuff opened">
-        <span class="legendcolorcircles" style="background-color: #0707ff"> </span
-        ><span class="legend_label"style="font-size:14.4px">AGENCY LOCATIONS</span><br />
-        <hr>
-        <div class="form-check form-switch">
-        <input
+        margin-top: -1px;
+      "
+      >▼</span
+    >
+    <span class="visually-hidden" id="legendA11yText">Hide legend</span>
+  </div>
+  <div class="metricsstuff open metrics">
+          <h6 class="metricheading" style="font-weight:bolder;text-align:center;">Citywide</h6>
+          <div class="subcat">Flood Zones</div>
+          <div >
+             <div class="cat1 rounded-1"><span>VE</span><span><span></div>
+             <div class="cat2 rounded-1"><span>A/AE/AO</span><span><span></div>
+             <div class="cat3 rounded-1"><span>V</span><span><span></div>
+          </div>          
+          <div class="subcat">Evacuation Zones</div>
+          <div >
+             <div class="evac1 rounded-1"><span>Zone 1</span><span><span></div>
+             <div class="evac2 rounded-1"><span>Zone 2</span><span><span></div>
+             <div class="evac3 rounded-1"><span>Zone 3</span><span><span></div>
+             <div class="evac4 rounded-1"><span>Zone 4</span><span><span></div>
+             <div class="evac5 rounded-1"><span>Zone 5</span><span><span></div>
+             <div class="evac6 rounded-1"><span>Zone 6</span><span><span></div>
+          </div>          
+          <div class="subcat">Facilities</div>
+          <div >
+            <div class="hospital  rounded-1"><span>Hospitals</span><span></span></div>
+            <div class="dialysis rounded-1"><span>Dialysis Centers</span><span></span></div>
+            <div class="nursing rounded-1"><span>Nursing Homes</span><span></span></div>
+            <div class="adult rounded-1"><span>Adult Care</span><span></span></div>
+            <div class="psychiatric rounded-1"><span>Psychiatric</span><span></span></div>  
+          </div>
+  </div>
+  <!-- legend section -->
+</div>
+<hr />
+
+<div
+  class="legendsection_">
+  
+  <div
+    class="legendsection controlsection" >
+    <h2>HIDE LEGEND/CONTROLS</h2>
+    <span
+      class="legendcontrol"
+      style="
+        cursor: pointer;
+        color: #9f9f9f;
+        align-self: flex-start;
+        margin-top: -1px;
+      "
+      >▼</span
+    >
+    <span class="visually-hidden" id="legendA11yText">Hide legend</span>
+  </div>
+  <div class="legendstuff open">
+    <div>
+      <span class="legendcolorcircles" style="background-color: #0707ff">
+      </span>
+      <span class="legend_label">AGENCY LOCATIONS</span
+      ><br />
+    </div>
+    <hr />
+    <div class="form-check form-switch">
+      <input
         class="form-check-input facilities"
         type="checkbox"
         role="switch"
-        id="flexSwitchCheckDefaultb" 
-        />
-        <label class="form-check-label" for="flexSwitchCheckDefaultb"
+        id="flexSwitchCheckDefaultb"
+      />
+      <label class="form-check-label" for="flexSwitchCheckDefaultb"
         >CRITICAL FACILITIES</label
-        >
+      >
+    </div>
+    <span class="legendcolorcircles hospital"> </span
+    ><span class="legend_label">Hospital</span><br />
+    <span class="legendcolorcircles dialysis"> </span
+    ><span class="legend_label">Dialysis Center</span><br />
+    <span class="legendcolorcircles nursing"> </span
+    ><span class="legend_label">Nursing Home</span><br />
+    <span class="legendcolorcircles adult"> </span
+    ><span class="legend_label">Adult Care Facility</span><br />
+    <span class="legendcolorcircles psychiatric"></span
+    ><span class="legend_label">Psychiatric Facility</span><br />
+    <hr />
+    <div class="geojsoncolors">
+        <div style="margin-bottom:5px;">
+            <input type="radio" id="firm" name="mylayer" checked />
+            <label for="firm">FEMA 2015 Preliminary FIRM</label>
         </div>
-        <span class="legendcolorcircles hospital"> </span
-        ><span class="legend_label">Hospital</span><br />
-        <span class="legendcolorcircles dialysis"> </span
-        ><span class="legend_label">Dialysis Center</span><br />
-        <span class="legendcolorcircles nursing"> </span
-        ><span class="legend_label">Nursing Home</span><br />
-        <span class="legendcolorcircles adult"> </span
-        ><span class="legend_label">Adult Care Facility</span><br />
-        <span class="legendcolorcircles psychiatric"></span
-        ><span class="legend_label">Psychiatric Facility</span><br />
-        <hr />
-        <div class="geojsoncolors">
-        <input type="radio" id="firm" name="mylayer" checked />
-        <label for="firm"> FEMA 2015 PRELIMINARY FIRM</label> <br />
-        <span class="cat1 legendcolorblocks"></span
-        ><span class="legend_label">ZONE VE (HIGH RISK: FLOODING AND WAVES)</span
-        ><br />
-        <span class="cat2 legendcolorblocks"></span
-        ><span class="legend_label">ZONES A/AE/O (HIGH RISK: FLOODING)</span><br />
-        <span class="cat3 legendcolorblocks"></span
-        ><span class="legend_label">ZONE X (MODERATE RISK: FLOODING)</span>
+        <div style="display:flex;flex-direction:row;">
+            <div class="cat1 legendcolorblocks"></div>
+            <div>ZONE VE - High Risk: Flooding and Waves</div>
         </div>
-        <div class="geojsoncolors">
-        <input type="radio" id="hurricane" name="mylayer" />
-        <label for="hurricane">HURRICANE EVACUATION ZONES</label> <br />
-        <span class="evac1 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 1</span><br />
-        <span class="evac2 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 2</span><br />
-        <span class="evac3 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 3</span><br />
-        <span class="evac4 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 4</span><br />
-        <span class="evac5 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 5</span><br />
-        <span class="evac6 legendcolorblocks"></span
-        ><span class="legend_label">Evacuation Zone 6</span><br />
+
+        <div style="display:flex;flex-direction:row;">
+            <div class="cat2 legendcolorblocks"></div>
+            <div>ZONES A/AE/O - High Risk: Flooding </div>
         </div>
+        <div style="display:flex;flex-direction:row;">
+            <div class="cat3 legendcolorblocks"></div>
+            <div>ZONE X - Moderate Risk: Flooding</div>
         </div>
+    </div>
+    <div class="geojsoncolors">
+      <input type="radio" id="hurricane" name="mylayer" />
+      <label for="hurricane">HURRICANE EVACUATION ZONES</label> <br />
+      <span class="evac1 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 1</span><br />
+      <span class="evac2 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 2</span><br />
+      <span class="evac3 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 3</span><br />
+      <span class="evac4 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 4</span><br />
+      <span class="evac5 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 5</span><br />
+      <span class="evac6 legendcolorblocks"></span
+      ><span class="legend_label">Evacuation Zone 6</span><br />
+    </div>
+  </div>
+</div>
         </div>`;
-      const legend = L.control({ position: "bottomleft" });
+      const legend = L.control({ position: "topleft" });
       legend.onAdd = function (map) {
         const div = L.DomUtil.create("div", "legend");
         div.innerHTML = legendHTML;
@@ -463,11 +613,9 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
         return div;
       };
       legend.addTo(map);
-
 //******
-      d3.csv("data/AgencyContinuityLocs_20250605.csv", function (e) {
-  map.createPane('locpane');
-  map.getPane('locpane').style.zIndex = 701;
+    d3.csv("https://nycdob.github.io/AgencyContinuity/data/AgencyContinuityLocs_20250605.csv", function (e) {
+    // d3.csv("data/AgencyContinuityLocs_20250605.csv", function (e) {
         points = e.map(function (d) {
           d.latLng = [+d.Lat, +d.Lon];
           return d;
@@ -486,6 +634,7 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
             .attr("z-index", "701")
             .on("click", function (d) {
               d3.event.stopPropagation();
+              clickedondatalayer=true;
               let _numemployees = addrct.get(d.Address.toUpperCase());
               map.openPopup(`
               <H6><B>Agency Location</b></H6>
@@ -500,14 +649,22 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
               d3.select(this).style("fill", "#FFDE21");
             })
             .on("mouseout", function () {
-              // d3.select(this).style("fill", "#000");
               d3.select(this).style("fill", "#0707ff");
             });
           pointsUpd
             .attr("cx", (d) => proj.latLngToLayerPoint(d.latLng).x)
             .attr("cy", (d) => proj.latLngToLayerPoint(d.latLng).y)
             .attr("r", () => 5 / proj.scale);
-        },{pane:'locpane'}).addTo(map);
+        },
+        // {pane:'locpane'}
+      ).addTo(map);
+map.on('click', function(e) {
+  if (clickedondatalayer){  
+        clickedondatalayer=false;
+        dodata(citymetrics,"Citywide","");        
+        return
+  }
+});
 
         map.on("moveend", () => {
           if (!currentSel || !currentProj) return;
@@ -523,7 +680,6 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
             });
         });
       });
-
       // const pointToggle = document.querySelector(".d3PointsLayer");  //toggle agency locations
       // pointToggle.addEventListener("click", (e) => {
       //   if (e.currentTarget.checked) {
@@ -532,16 +688,13 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
       //     map.removeLayer(pointsOverlay);
       //   }
       // });
-
       const mylayerRadios = document.querySelectorAll('input[name="mylayer"]');
       mylayerRadios.forEach((x) =>
         x.addEventListener("click", () => {
           let theid = x.id;
           if (theid === "hurricane") {
             firm2015.setStyle({ opacity: 0, fillOpacity: 0 });
-            hurricaneZones.setStyle({ opacity: 1, fillOpacity: 1.0 });
-            map.getPane('locpane').bringToFront();
-
+            hurricaneZones.setStyle({ opacity: 1, fillOpacity: 1 });
           } else {
             hurricaneZones.setStyle({ opacity: 0, fillOpacity: 0.0 });
             firm2015.setStyle({ opacity: 1, fillOpacity: 0.5 });
@@ -562,26 +715,41 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
         const zoom = map.getZoom();
         if (zoom === lastZoom) return;
         lastZoom = zoom;
-        criticalmarkers.forEach((m) => m.setRadius(5));
+        // criticalmarkers.forEach((m) => m.setRadius(5));
+        criticalmarkers.forEach((m) => m.setRadius(1));
       });
-
-      const legendcontrol_ = document.querySelector(".legendcontrol_");
+      const legendsection = document.querySelector(".legendsection");
+      const legendcontrol = document.querySelector(".legendcontrol");
       const legendstuff_ = document.querySelector(".legendstuff");
-
-      legendcontrol_.addEventListener("click", (e) => {
+      const metricssection = document.querySelector(".metricssection");
+      const metricscontrol = document.querySelector(".metricscontrol");
+      const metricsstuff = document.querySelector(".metricsstuff");
+      legendsection.addEventListener("click", (e) => {
         legendstuff_.classList.toggle("closed");
         if (legendstuff_.classList.contains("closed")) {
-          legendcontrol_.textContent = "▲";
+          document.querySelector(".legendsection h2").textContent="SHOW LEGEND/CONTROLS";
+          legendcontrol.textContent = "▲";
         } else {
-          legendcontrol_.textContent = "▼";
+          document.querySelector(".legendsection h2").textContent="HIDE LEGEND/CONTROLS"
+          legendcontrol.textContent = "▼";
+        }
+      });
+      metricssection.addEventListener("click", (e) => {
+        metricsstuff.classList.toggle("closed");
+        if (metricsstuff.classList.contains("closed")) {
+
+          document.querySelector(".metricssection h2").textContent="SHOW METRICS";
+          metricscontrol.textContent = "▲";
+        } else {
+          document.querySelector(".metricssection h2").textContent="HIDE METRICS"
+          metricscontrol.textContent = "▼";
         }
       });
     </script>
-
     <script type="module">
       // tree
       import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-      const mydata = await d3.csv("data/staff.csv", function (e) {
+      const mydata = await d3.csv("https://nycdob.github.io/AgencyContinuity/data/staff.csv", function (e) {
         return {
           unit: e["UNIT"].trim()
             ? e["UNIT"].trim().toUpperCase()
@@ -775,7 +943,7 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
       );
       document.querySelector("._dlData").addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = "data/staff.csv";
+        window.location.href = "https://nycdob.github.io/AgencyContinuity/data/staff.csv";
       });
 
       document.querySelector("._opensearch").addEventListener("click", (e) => {
@@ -840,13 +1008,9 @@ map.getPane('cbbackgroundpane').style.zIndex=300;
           .querySelectorAll(".nested")
           .forEach((_x) => _x.classList.add("active"));
       };
-
-
-document.querySelector(".showhelp").addEventListener("click", () => {
-  document.querySelector("#favDialog").showModal();
-}); 
-
-
+      document.querySelector(".showhelp").addEventListener("click", () => {
+        document.querySelector("#favDialog").showModal();
+      }); 
     </script>
   </body>
 </html>
